@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import requests,datetime
+import requests,datetime,os
 
 
 
@@ -56,7 +56,7 @@ def GetArticle(url,rule):
 
 def OutputStringListToFile(article_list,file_name):
     try:
-        with open('./output/'+file_name,mode='w') as f:
+        with open(file_name,mode='w') as f:
             for l in article_list:
                 f.write(l)
         return 0
@@ -68,9 +68,11 @@ if __name__ == '__main__':
     media = MEDIALIST[0]
     urls = GetArticleUrlFromRSS(media.RSSUrl)
     fileNum = 1
+    dirpath = "./output/" + media.Name + "/" + datetime.datetime.now().strftime('%Y-%m-%d')
+    os.makedirs(dirpath, exist_ok=True)
     for url in urls:
         articleList = GetArticle(url,media.SelectRule)
-        filename = media.Name + datetime.datetime.now().strftime('%Y-%m-%d') + "-" + str(fileNum)
+        filename = dirpath+  "/" + str(fileNum)
         result = OutputStringListToFile(articleList,filename)
         if result != 0:
             break
