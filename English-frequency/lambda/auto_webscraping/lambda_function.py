@@ -26,7 +26,7 @@ def GetArticleUrlFromRSS(rss_url):
         print(f"GetArticleUrlFromRSS ERROR: Request Failed. Status Code is {req.status_code}")
         return resultLinks
     
-    soup = BeautifulSoup(req.text,"html5lib")
+    soup = BeautifulSoup(req.text,"xml")
     links = soup.select(selectRule)
 
     for l in links:
