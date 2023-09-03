@@ -2,7 +2,7 @@ import sys
 sys.path.append("lib.bs4")
 
 from bs4 import BeautifulSoup
-import requests,datetime,os,boto3
+import requests,datetime,os,boto3,xmltodict
 
 class Media:
     ID: int
@@ -26,11 +26,14 @@ def GetArticleUrlFromRSS(rss_url):
         print(f"GetArticleUrlFromRSS ERROR: Request Failed. Status Code is {req.status_code}")
         return resultLinks
     
-    soup = BeautifulSoup(req.text,"xml")
-    links = soup.select(selectRule)
 
-    for l in links:
-        resultLinks.append(l.get_text())
+
+    dict_xml_data = xmltodict.parse(req.text)
+    items = dict_xml_data["rss"]["channel"]["item"]
+
+    for i in items:
+        resultLinks.append(i["link"])
+
 
     return resultLinks
 

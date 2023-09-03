@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import requests,datetime,os
+import requests,datetime,os,xmltodict
 
 
 
@@ -27,11 +27,15 @@ def GetArticleUrlFromRSS(rss_url):
         print(f"GetArticleUrlFromRSS ERROR: Request Failed. Status Code is {req.status_code}")
         return resultLinks
     
-    soup = BeautifulSoup(req.text,"xml")
-    links = soup.select(selectRule)
+    dict_xml_data = xmltodict.parse(req.text)
+    # print(dict_xml_data["rss"]["channel"]["item"][0]["link"])
+    # soup = BeautifulSoup(req.text,"xml")
+    # links = soup.select(selectRule)
 
-    for l in links:
-        resultLinks.append(l.get_text())
+    items = dict_xml_data["rss"]["channel"]["item"]
+
+    for i in items:
+        resultLinks.append(i["link"])
 
     return resultLinks
 
