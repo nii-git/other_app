@@ -2,6 +2,7 @@ import sys
 sys.path.append("lib.bs4")
 
 from bs4 import BeautifulSoup
+from botocore.config import Config
 import requests,datetime,os,boto3,xmltodict
 
 class Media:
@@ -22,18 +23,16 @@ def GetArticleUrlFromRSS(rss_url):
     resultLinks = []
     req = requests.get(rss_url)
     selectRule = 'link'
+
     if req.status_code != 200:
         print(f"GetArticleUrlFromRSS ERROR: Request Failed. Status Code is {req.status_code}")
         return resultLinks
     
-
-
     dict_xml_data = xmltodict.parse(req.text)
     items = dict_xml_data["rss"]["channel"]["item"]
 
     for i in items:
         resultLinks.append(i["link"])
-
 
     return resultLinks
 
@@ -68,16 +67,18 @@ def OutputStringListToFile(article_list,file_name):
 
 def OutputStringListToS3(article_list,key):
     try:
-        for l in article_list:
-            obj = s3.Object(BUCKET,key)
-            obj.put(Body=l)
+        article_body = " ".join(article_list)
+        obj = s3.Object(BUCKET,key)
+        obj.put(Body=article_body)
+        return 0
+        
     except Exception as e:
         print(f"OutputStringListToS3 ERROR: {e}")
         return -1
 
 
 
-s3 = boto3.resource('s3')
+s3 = boto3.resource('s3', config=Config(signature_version='s3v4'))
 MEDIALIST = []
 MEDIALIST.append(Media(1,"BSS","http://feeds.bbci.co.uk/news/rss.xml#",'body > div > div > div > div > div > div > div > main > article > div > div > p[class*="Paragraph"]'))
 BUCKET = 'nii-dev' 
@@ -87,15 +88,16 @@ def lambda_handler(event, context):
     media = MEDIALIST[0]
     urls = GetArticleUrlFromRSS(media.RSSUrl)
     fileNum = 1
-    keypath = "./english-frequency/articles/" + media.Name + "/" + datetime.datetime.now().strftime('%Y-%m-%d')
-    # os.makedirs(dirpath, exist_ok=True)
+    keypath = "english-frequency/articles/" + media.Name + "/" + datetime.datetime.now().strftime('%Y-%m-%d')
+
     for url in urls:
         articleList = GetArticle(url,media.SelectRule)
-        filename = keypath+  "/" + str(fileNum)
+        filename = keypath+  "/" + str(fileNum) + ".txt"
         result = OutputStringListToS3(articleList,filename)
         if result != 0:
             break
         fileNum += 1
+
     return
 
 
