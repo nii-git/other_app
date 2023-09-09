@@ -1,0 +1,38 @@
+
+CREATE DATABASE english_frequency;
+
+
+CREATE TABLE word (
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    word VARCHAR(45),
+    word_type TINYINT
+);
+
+CREATE TABLE mst_wordtype(
+    word_type_id int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    word_type_name VARCHAR(20)
+);
+
+CREATE TABLE translation(
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    word_id INT,
+    word_jp VARCHAR(100),
+    word_type_id INT,
+    FOREIGN KEY fk_word_id (word_id) REFERENCES word (id),
+    FOREIGN KEY fk_word_type (word_type_id) REFERENCES mst_wordtype (word_type_id)
+);
+
+CREATE TABLE provider(
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    site_name VARCHAR(50),
+    url VARCHAR(100)
+);
+
+CREATE TABLE frequency(
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    provider_id INT,
+    word_id INT,
+    count INT,
+    FOREIGN KEY fk_provider_id (provider_id) REFERENCES provider (id),
+    FOREIGN KEY fk_word_id (word_id) REFERENCES word (id)
+);
