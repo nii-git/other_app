@@ -22,17 +22,17 @@ CREATE TABLE translation(
     FOREIGN KEY fk_word_type (word_type_id) REFERENCES mst_wordtype (word_type_id)
 );
 
-CREATE TABLE provider(
-    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+CREATE TABLE mst_provider(
+    id VARCHAR(20) PRIMARY KEY NOT NULL,
     site_name VARCHAR(50),
     url VARCHAR(100)
 );
 
 CREATE TABLE frequency(
     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    provider_id INT,
+    provider_id VARCHAR(20),
     word_id INT,
     count INT,
-    FOREIGN KEY fk_provider_id (provider_id) REFERENCES provider (id),
+    FOREIGN KEY fk_provider_id (provider_id) REFERENCES mst_provider (id),
     FOREIGN KEY fk_word_id (word_id) REFERENCES word (id)
 );

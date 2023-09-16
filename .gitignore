@@ -1,5 +1,5 @@
 English-frequency/local_src/output/
 English-frequency/local_src/result/
-English-frequency/lambda/auto_webscraping/package
+English-frequency/lambda/*/package
 .DS_Store
 memo.txt
