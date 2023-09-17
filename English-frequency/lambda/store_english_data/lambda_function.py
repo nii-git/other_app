@@ -2,6 +2,7 @@ import pymysql
 import sys
 import boto3
 import os
+import datetime
 import glob,re
 import pandas as pd
 
@@ -16,7 +17,10 @@ DBNAME="english_frequency"
 
 def init(event):
     provider = event["provider"]
-    date = event["date"]
+    format = "%Y-%m-%dT%H:%M:%SZ"
+    date_utc = datetime.datetime.strptime(event["datetime"],format)
+    date_jst = date_utc + datetime.timedelta(hours=9)
+    date = date_jst.strftime("%Y-%m-%d")
     return provider,date
 
 def getpath(s3client,provider,day):
@@ -38,7 +42,7 @@ def local_output(df_groupby,provider,day):
 
 
 def db_error_killed_process(conn,err_msg,rollback=True):
-    print("ERROR: Can't load uncategory-id")
+    print(err_msg)
     if rollback:
         conn.rollback()
     sys.exit(-1)
@@ -50,10 +54,10 @@ def output(df_groupby,provider,day):
             result_count = cur.execute("SELECT word_type_id FROM mst_wordtype WHERE word_type_name = '未分類'")
             if result_count != 1:
                 db_error_killed_process(conn,"ERROR: Can't load uncategory-id",rollback=False)
-            uncategory_id = cur.fetchall()[0]["word_type_id"]
+            uncategory_id = cur.fetchall()[0][0]
 
             # providerのidを確認
-            result_count = cur.execute("SELECT id FROM provider WHERE id = %s",provider)
+            result_count = cur.execute("SELECT id FROM mst_provider WHERE id = %s",(provider,))
             if result_count != 1:
                 db_error_killed_process(conn,"ERROR: Can't load provider-id",rollback=False)
 
@@ -61,25 +65,26 @@ def output(df_groupby,provider,day):
             for i in range(0,df_groupby.count()):
                 word = df_groupby.index[i]
                 count = df_groupby.values[i]
-                result_count = cur.execute("SELECT id FROM word WHERE word = %s", word)
+                result_count = cur.execute("SELECT id FROM word WHERE word = %s", (word,))
 
                 if result_count == 0:
                     # wordテーブルにない場合
-                    result_count = cur.execute("INSERT INTO word(word,word_tpe) VALUES ('%s',%d)",word,uncategory_id)
+                    result_count = cur.execute("INSERT INTO word(word,word_type) VALUES (%s,%s)",(word,uncategory_id))
                     if result_count != 1:
                         db_error_killed_process(conn,"ERROR: Failed to write word table")
                     # 再度wordidを取得する
-                    result_count = cur.execute("SELECT id FROM word WHERE word = %s", word)
+                    result_count = cur.execute("SELECT id FROM word WHERE word = %s", (word,))
                     if result_count != 1:
+                        print(cur.fetchall())
                         db_error_killed_process(conn,"ERROR: Failed to get wordid")
-                    word_id = cur.fetchall()[0]["id"]
+                    word_id = cur.fetchall()[0][0]
                 elif result_count > 1:
                     db_error_killed_process(conn,"ERROR: Inconsistency in word table")
                 else:
-                    word_id = cur.fetchall()[0]["id"]
+                    word_id = cur.fetchall()[0][0]
                 
                 # frequencyテーブルに登録
-                result_count = cur.execute("INSERT INTO frequency(provider_id,word_id,count) VALUES ('%s',%d,%d)",provider,word_id,count) 
+                result_count = cur.execute("INSERT INTO frequency(provider_id,word_id,count,date) VALUES (%s,%s,%s,%s)",(provider,word_id,count,day))
                 if result_count != 1:
                     db_error_killed_process("ERROR: Failed to insert frequency data")
 
