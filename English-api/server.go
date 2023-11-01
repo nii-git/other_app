@@ -26,6 +26,7 @@ func main() {
 
 }
 
+// todo: 接続先情報はconfigに
 func connectDB() (*sql.DB, error) {
 	jst, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
