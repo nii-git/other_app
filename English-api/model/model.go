@@ -1,14 +1,14 @@
 package model
 
 type (
-	frequency_request struct {
-		Date  string `json:"date"`
-		Order string `json:"order"`
-		Limit int    `json:"limit"`
-		Page  int    `json:"page"`
+	Frequency_request struct {
+		Date  string `param:"date"`
+		Order string `param:"order"`
+		Limit int    `param:"limit"`
+		Page  int    `param:"page"`
 	}
 
-	frequency_response struct {
+	Frequency_response struct {
 		Error string                    `json:"error"`
 		Body  []frequency_response_body `json:"body"`
 	}

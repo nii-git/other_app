@@ -4,6 +4,7 @@ import (
 	"english-frequency/config"
 	"english-frequency/handler"
 	"english-frequency/infra"
+	"english-frequency/usecase"
 	"os"
 	"runtime"
 
@@ -49,7 +50,19 @@ func main() {
 	}
 
 	// sloggerの初期化
-	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+	loglevel := slog.Level(-8)
+	switch config.LogLevel {
+	case "DEBUG":
+		loglevel = slog.LevelDebug
+	case "INFO":
+		loglevel = slog.LevelInfo
+	case "WARN":
+		loglevel = slog.LevelWarn
+	case "ERROR":
+		loglevel = slog.LevelError
+	}
+
+	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: loglevel}))
 
 	// db接続
 	db, err := infra.NewDB(config, logger)
@@ -59,8 +72,11 @@ func main() {
 		runtime.Goexit()
 	}
 
+	// usecase
+	usecase := usecase.NewUsecase(*logger, *db)
+
 	// handler
-	handler := handler.NewHandler(*logger)
+	handler := handler.NewHandler(*logger, *usecase)
 
 	server := NewServer(*logger, *config, *db, *handler)
 
