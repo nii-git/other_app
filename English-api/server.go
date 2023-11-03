@@ -1,60 +1,72 @@
 package main
 
 import (
+	"english-frequency/config"
 	"english-frequency/handler"
-	"log"
+	"english-frequency/infra"
+	"os"
+	"runtime"
 
-	"database/sql"
+	"golang.org/x/exp/slog"
 
-	"time"
-
-	"github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo/v4"
 )
 
-func main() {
-	db, err := connectDB()
-	if err != nil {
-		log.Fatalf("err")
-	}
-	defer db.Close()
-
-	e := echo.New()
-	e.GET("/", handler.Handler())
-	e.GET("/frequency", handler.FrequencyHandler(db))
-	e.Logger.Fatal(e.Start(":1323"))
-
+// サーバー
+type Server struct {
+	logger  slog.Logger
+	config  config.Config
+	db      infra.DB
+	handler handler.Handler
 }
 
-// todo: 接続先情報はconfigに
-func connectDB() (*sql.DB, error) {
-	jst, err := time.LoadLocation("Asia/Tokyo")
-	if err != nil {
-		log.Fatalf("err")
-		return nil, err
+// サーバーコンストラクタ
+func NewServer(logger slog.Logger, config config.Config, db infra.DB, handler handler.Handler) *Server {
+	return &Server{
+		logger:  logger,
+		config:  config,
+		db:      db,
+		handler: handler,
 	}
-	c := mysql.Config{
-		DBName:    "english_frequency",
-		User:      "root",
-		Passwd:    "",
-		Addr:      "localhost:3306",
-		Net:       "tcp",
-		ParseTime: true,
-		Collation: "utf8mb4_unicode_ci",
-		Loc:       jst,
-	}
-	db, err := sql.Open("mysql", c.FormatDSN())
+}
+
+// サーバー起動、ルーティング登録
+func (s *Server) Start() error {
+	e := echo.New()
+	e.GET("/", s.handler.HandlerFunc())
+	e.GET("/frequency", s.handler.FrequencyHandlerFunc())
+	return e.Start(s.config.ServerAddress)
+}
+
+func main() {
+
+	// configの作成
+	config, err := config.NewConfig()
+
 	if err != nil {
-		log.Fatalf("err")
+		println("Server Init Error " + err.Error())
+		runtime.Goexit()
 	}
 
-	err = db.Ping()
+	// sloggerの初期化
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+
+	// db接続
+	db, err := infra.NewDB(config, logger)
+
 	if err != nil {
-		log.Fatal(err)
-		return nil, err
-	} else {
-		log.Println("データベース接続完了")
+		logger.Error("Server init Error " + err.Error())
+		runtime.Goexit()
 	}
 
-	return db, err
+	// handler
+	handler := handler.NewHandler(*logger)
+
+	server := NewServer(*logger, *config, *db, *handler)
+
+	if err = server.Start(); err != nil {
+		logger.Error("Server init Error " + err.Error())
+		runtime.Goexit()
+	}
+
 }
