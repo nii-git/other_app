@@ -1,5 +1,7 @@
 English-frequency/local_src/output/
 English-frequency/local_src/result/
 English-frequency/lambda/*/package
+English-frequency/db/sqldump*
+English-api/config/
 .DS_Store
 memo.txt
