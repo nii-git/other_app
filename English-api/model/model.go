@@ -10,14 +10,14 @@ type (
 
 	Frequency_response struct {
 		Error string                    `json:"error"`
-		Body  []frequency_response_body `json:"body"`
+		Body  []Frequency_response_body `json:"body"`
 	}
-	frequency_response_body struct {
+	Frequency_response_body struct {
 		Word        string        `json:"word"`
 		Count       int           `json:"int"`
-		Translation []translation `json:"translation"`
+		Translation []Translation `json:"translation"`
 	}
-	translation struct {
+	Translation struct {
 		Wordtype string `json:"wordtype"`
 		WordJp   string `json:"word_jp"`
 	}
