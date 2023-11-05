@@ -2,10 +2,10 @@ package model
 
 type (
 	Frequency_request struct {
-		Date  string `param:"date"`
+		Date  string `param:"date" validate:"date_validation,required"`
 		Order string `param:"order"`
-		Limit int    `param:"limit"`
-		Page  int    `param:"page"`
+		Limit int    `param:"limit" validate:"limit_validation"`
+		Page  int    `param:"page" validate:"page_validation"`
 	}
 
 	Frequency_response struct {
@@ -15,6 +15,7 @@ type (
 	Frequency_response_body struct {
 		Word        string        `json:"word"`
 		Count       int           `json:"int"`
+		ProviderId  string        `json:"provider_id"`
 		Translation []Translation `json:"translation"`
 	}
 	Translation struct {

@@ -20,7 +20,7 @@ func NewUsecase(logger slog.Logger, db infra.DB) *Usecase {
 	}
 }
 
-func (u *Usecase) FrequencyUsecase(request model.Frequency_request) (response *model.Frequency_response, err error) {
+func (u *Usecase) FrequencyUsecase(request model.Frequency_request) (*model.Frequency_response, error) {
 	u.logger.Debug("Frequency usecase called")
 	query := fmt.Sprintf(`
 	SELECT frequency.provider_id, word.word, frequency.count, frequency.date
@@ -30,7 +30,8 @@ func (u *Usecase) FrequencyUsecase(request model.Frequency_request) (response *m
 	WHERE date = "%s"
 	ORDER BY frequency.count DESC
 	LIMIT %d
-	`, request.Date, request.Limit)
+	OFFSET %d ;
+	`, request.Date, request.Limit, request.Page*request.Limit)
 
 	res, err := u.db.DBConnection.Query(query)
 
@@ -57,12 +58,12 @@ func (u *Usecase) FrequencyUsecase(request model.Frequency_request) (response *m
 		resbody[i] = model.Frequency_response_body{
 			Word:        v.WordName,
 			Count:       v.Count,
+			ProviderId:  v.ProviderId,
 			Translation: []model.Translation{},
 		}
 	}
-
+	var response model.Frequency_response
 	response.Body = resbody
 
-	fmt.Printf("%#v \n", result)
-	return nil, nil
+	return &response, nil
 }

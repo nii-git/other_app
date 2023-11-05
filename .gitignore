@@ -5,3 +5,4 @@ English-frequency/db/sqldump*
 English-api/config/
 .DS_Store
 memo.txt
+.vscode

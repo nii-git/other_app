@@ -4,9 +4,9 @@ import (
 	"english-frequency/config"
 	"english-frequency/handler"
 	"english-frequency/infra"
+	"english-frequency/model"
 	"english-frequency/usecase"
 	"os"
-	"runtime"
 
 	"golang.org/x/exp/slog"
 
@@ -46,7 +46,7 @@ func main() {
 
 	if err != nil {
 		println("Server Init Error " + err.Error())
-		runtime.Goexit()
+		panic(err)
 	}
 
 	// sloggerの初期化
@@ -69,20 +69,23 @@ func main() {
 
 	if err != nil {
 		logger.Error("Server init Error " + err.Error())
-		runtime.Goexit()
+		panic(err)
 	}
+
+	// validator
+	validator := model.NewValidator()
 
 	// usecase
 	usecase := usecase.NewUsecase(*logger, *db)
 
 	// handler
-	handler := handler.NewHandler(*logger, *usecase)
+	handler := handler.NewHandler(*logger, *usecase, *validator)
 
 	server := NewServer(*logger, *config, *db, *handler)
 
 	if err = server.Start(); err != nil {
 		logger.Error("Server init Error " + err.Error())
-		runtime.Goexit()
+		panic(err)
 	}
 
 }

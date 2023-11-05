@@ -11,14 +11,16 @@ import (
 )
 
 type Handler struct {
-	logger  slog.Logger
-	usecase usecase.Usecase
+	logger    slog.Logger
+	usecase   usecase.Usecase
+	validator model.Validator
 }
 
-func NewHandler(logger slog.Logger, usecase usecase.Usecase) *Handler {
+func NewHandler(logger slog.Logger, usecase usecase.Usecase, validator model.Validator) *Handler {
 	return &Handler{
-		logger:  logger,
-		usecase: usecase,
+		logger:    logger,
+		usecase:   usecase,
+		validator: validator,
 	}
 }
 
@@ -38,16 +40,16 @@ func (h *Handler) FrequencyHandlerFunc() echo.HandlerFunc {
 			limitparam, err = strconv.Atoi(c.QueryParam("Limit"))
 			if err != nil {
 				h.logger.Error("FrequencyHandlerFunc Invalid limitparam: " + err.Error())
-				return c.JSON(http.StatusBadRequest, model.Frequency_response{Error: err.Error(), Body: nil})
+				return c.JSON(http.StatusBadRequest, model.Frequency_response{Error: "VALIDATION_ERROR", Body: nil})
 			}
 		}
 
-		pageparam := -1
+		pageparam := 0
 		if c.QueryParam("Page") != "" {
 			pageparam, err = strconv.Atoi(c.QueryParam("Page"))
 			if err != nil {
 				h.logger.Error("FrequencyHandlerFunc Invalid pageparam: " + err.Error())
-				return c.JSON(http.StatusBadRequest, model.Frequency_response{Error: err.Error(), Body: nil})
+				return c.JSON(http.StatusBadRequest, model.Frequency_response{Error: "VALIDATION_ERROR", Body: nil})
 			}
 		}
 
@@ -58,7 +60,17 @@ func (h *Handler) FrequencyHandlerFunc() echo.HandlerFunc {
 			Page:  pageparam,
 		}
 
-		h.usecase.FrequencyUsecase(request)
-		return c.String(http.StatusOK, c.QueryParam("Page"))
+		if err = h.validator.Validator.Struct(request); err != nil {
+			h.logger.Error("FrequencyHandlerFunc ValidationError: " + err.Error())
+			return c.JSON(http.StatusBadRequest, &model.Frequency_response{Error: "VALIDATION_ERROR", Body: nil})
+		}
+
+		res, err := h.usecase.FrequencyUsecase(request)
+
+		if err != nil {
+			h.logger.Error("FrequencyHandlerFunc UsecaseError:" + err.Error())
+			return c.JSON(http.StatusNotFound, &model.Frequency_response{Error: "SQL_ERROR", Body: nil})
+		}
+		return c.JSON(http.StatusOK, res)
 	}
 }
