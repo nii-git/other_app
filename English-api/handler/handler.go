@@ -1,19 +1,26 @@
 package handler
 
 import (
+	"english-frequency/model"
+	"english-frequency/usecase"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"golang.org/x/exp/slog"
 )
 
 type Handler struct {
-	logger slog.Logger
+	logger    slog.Logger
+	usecase   usecase.Usecase
+	validator model.Validator
 }
 
-func NewHandler(logger slog.Logger) *Handler {
+func NewHandler(logger slog.Logger, usecase usecase.Usecase, validator model.Validator) *Handler {
 	return &Handler{
-		logger: logger,
+		logger:    logger,
+		usecase:   usecase,
+		validator: validator,
 	}
 }
 
@@ -24,9 +31,46 @@ func (h *Handler) HandlerFunc() echo.HandlerFunc {
 }
 
 func (h *Handler) FrequencyHandlerFunc() echo.HandlerFunc {
-	// todo:usecase
-	return func(c echo.Context) error {
-		h.logger.Info("frequency called")
-		return c.String(http.StatusOK, c.QueryParam("test"))
+	return func(c echo.Context) (err error) {
+		h.logger.Debug("frequency handler called")
+
+		// TODO: validation
+		limitparam := 100
+		if c.QueryParam("Limit") != "" {
+			limitparam, err = strconv.Atoi(c.QueryParam("Limit"))
+			if err != nil {
+				h.logger.Error("FrequencyHandlerFunc Invalid limitparam: " + err.Error())
+				return c.JSON(http.StatusBadRequest, model.Frequency_response{Error: "VALIDATION_ERROR", Body: nil})
+			}
+		}
+
+		pageparam := 0
+		if c.QueryParam("Page") != "" {
+			pageparam, err = strconv.Atoi(c.QueryParam("Page"))
+			if err != nil {
+				h.logger.Error("FrequencyHandlerFunc Invalid pageparam: " + err.Error())
+				return c.JSON(http.StatusBadRequest, model.Frequency_response{Error: "VALIDATION_ERROR", Body: nil})
+			}
+		}
+
+		request := model.Frequency_request{
+			Date:  c.QueryParam("Date"),
+			Order: c.QueryParam("Order"),
+			Limit: limitparam,
+			Page:  pageparam,
+		}
+
+		if err = h.validator.Validator.Struct(request); err != nil {
+			h.logger.Error("FrequencyHandlerFunc ValidationError: " + err.Error())
+			return c.JSON(http.StatusBadRequest, &model.Frequency_response{Error: "VALIDATION_ERROR", Body: nil})
+		}
+
+		res, err := h.usecase.FrequencyUsecase(request)
+
+		if err != nil {
+			h.logger.Error("FrequencyHandlerFunc UsecaseError:" + err.Error())
+			return c.JSON(http.StatusNotFound, &model.Frequency_response{Error: "SQL_ERROR", Body: nil})
+		}
+		return c.JSON(http.StatusOK, res)
 	}
 }

@@ -1,23 +1,24 @@
 package model
 
 type (
-	frequency_request struct {
-		Date  string `json:"date"`
-		Order string `json:"order"`
-		Limit int    `json:"limit"`
-		Page  int    `json:"page"`
+	Frequency_request struct {
+		Date  string `param:"date" validate:"date_validation,required"`
+		Order string `param:"order"`
+		Limit int    `param:"limit" validate:"limit_validation"`
+		Page  int    `param:"page" validate:"page_validation"`
 	}
 
-	frequency_response struct {
+	Frequency_response struct {
 		Error string                    `json:"error"`
-		Body  []frequency_response_body `json:"body"`
+		Body  []Frequency_response_body `json:"body"`
 	}
-	frequency_response_body struct {
+	Frequency_response_body struct {
 		Word        string        `json:"word"`
 		Count       int           `json:"int"`
-		Translation []translation `json:"translation"`
+		ProviderId  string        `json:"provider_id"`
+		Translation []Translation `json:"translation"`
 	}
-	translation struct {
+	Translation struct {
 		Wordtype string `json:"wordtype"`
 		WordJp   string `json:"word_jp"`
 	}

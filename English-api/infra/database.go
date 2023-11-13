@@ -10,7 +10,7 @@ import (
 )
 
 type DB struct {
-	db *sql.DB
+	DBConnection *sql.DB
 }
 
 // DBコンストラクタ
@@ -43,5 +43,5 @@ func NewDB(config *config.Config, logger *slog.Logger) (*DB, error) {
 	} else {
 		logger.Info("DB has been connected")
 	}
-	return &DB{db: db}, err
+	return &DB{DBConnection: db}, err
 }
