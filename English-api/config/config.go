@@ -6,12 +6,13 @@ import (
 )
 
 type Config struct {
-	DBName        string `json:"dbname" validate:"required"`
-	DBUserName    string `json:"dbusername" validate:"required"`
-	DBPassword    string `json:"dbpassword" validate:"required"`
-	DBAddress     string `json:"dbaddress" validate:"required"`
-	ServerAddress string `json:"serveraddress" validate:"required"`
-	LogLevel      string `json:"loglevel" validate:"required"`
+	DBName          string `json:"dbname" validate:"required"`
+	DBUserName      string `json:"dbusername" validate:"required"`
+	DBPassword      string `json:"dbpassword" validate:"required"`
+	DBAddress       string `json:"dbaddress" validate:"required"`
+	ServerAddress   string `json:"serveraddress" validate:"required"`
+	LogLevel        string `json:"loglevel" validate:"required"`
+	MaxDBRetryCount int    `json:"maxdbretrycount" validate:"required"`
 }
 
 func NewConfig() (*Config, error) {

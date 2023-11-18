@@ -3,6 +3,7 @@ package infra
 import (
 	"database/sql"
 	"english-frequency/config"
+	"strconv"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -30,18 +31,33 @@ func NewDB(config *config.Config, logger *slog.Logger) (*DB, error) {
 		Collation: "utf8mb4_unicode_ci",
 		Loc:       jst,
 	}
-	db, err := sql.Open("mysql", c.FormatDSN())
+
+	var db *sql.DB
+
+	for r := 1; r < config.MaxDBRetryCount; r++ {
+		db, err = sql.Open("mysql", c.FormatDSN())
+		if err != nil {
+			time.Sleep(10 * time.Second)
+			logger.Error("NewDB SQL Connection Attept #" + strconv.Itoa(r))
+			logger.Debug("NewDB SQL Connection Error:" + err.Error())
+			continue
+		}
+
+		err = db.Ping()
+		if err != nil {
+			logger.Error("NewDB SQL Connection Attept #" + strconv.Itoa(r))
+			time.Sleep(10 * time.Second)
+			continue
+		} else {
+			break
+		}
+	}
+
 	if err != nil {
-		logger.Error("NewDB SQL Open Error:" + err.Error())
+		logger.Error("NewDB SQL Connection Error:" + err.Error())
 		return nil, err
 	}
 
-	err = db.Ping()
-	if err != nil {
-		logger.Error("NewDB SQL Ping Error:" + err.Error())
-		return nil, err
-	} else {
-		logger.Info("DB has been connected")
-	}
+	logger.Debug("NewDB SQL Connection Succeeded!")
 	return &DB{DBConnection: db}, err
 }
