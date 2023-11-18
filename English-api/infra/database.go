@@ -37,15 +37,16 @@ func NewDB(config *config.Config, logger *slog.Logger) (*DB, error) {
 	for r := 1; r < config.MaxDBRetryCount; r++ {
 		db, err = sql.Open("mysql", c.FormatDSN())
 		if err != nil {
-			time.Sleep(10 * time.Second)
 			logger.Error("NewDB SQL Connection Attept #" + strconv.Itoa(r))
-			logger.Debug("NewDB SQL Connection Error:" + err.Error())
+			logger.Error("NewDB SQL Connection Error:" + err.Error())
+			time.Sleep(10 * time.Second)
 			continue
 		}
 
 		err = db.Ping()
 		if err != nil {
 			logger.Error("NewDB SQL Connection Attept #" + strconv.Itoa(r))
+			logger.Error("NewDB SQL Connection Error:" + err.Error())
 			time.Sleep(10 * time.Second)
 			continue
 		} else {
