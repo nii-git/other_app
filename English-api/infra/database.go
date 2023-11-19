@@ -34,7 +34,7 @@ func NewDB(config *config.Config, logger *slog.Logger) (*DB, error) {
 
 	var db *sql.DB
 
-	for r := 1; r < config.MaxDBRetryCount; r++ {
+	for r := 1; r <= config.MaxDBRetryCount; r++ {
 		db, err = sql.Open("mysql", c.FormatDSN())
 		if err != nil {
 			logger.Error("NewDB SQL Connection Attept #" + strconv.Itoa(r))

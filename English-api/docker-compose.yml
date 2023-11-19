@@ -10,6 +10,9 @@ services:
       MYSQL_DATABASE: english_frequency
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: password
+    volumes:
+    - ./infra/initdb:/docker-entrypoint-initdb.d
+    
   api:
     build:
       context: .

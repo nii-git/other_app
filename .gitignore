@@ -6,3 +6,4 @@ English-api/config/*.json
 .DS_Store
 memo.txt
 .vscode
+English-api/infra/initdb/*
