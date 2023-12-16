@@ -1,5 +1,5 @@
 # ベースイメージの指定
-FROM golang:latest
+FROM --platform=linux/x86_64 golang:latest
 ARG ENV="local" 
 ENV ENV ${ENV}
 
