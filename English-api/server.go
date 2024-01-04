@@ -41,7 +41,7 @@ func (s *Server) Start() error {
 
 func main() {
 
-	// configの作成
+	// config読み込み
 	config, err := config.NewConfig()
 
 	if err != nil {

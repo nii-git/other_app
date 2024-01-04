@@ -22,14 +22,15 @@ func NewDB(config *config.Config, logger *slog.Logger) (*DB, error) {
 		return nil, err
 	}
 	c := mysql.Config{
-		DBName:    config.DBName,
-		User:      config.DBUserName,
-		Passwd:    config.DBPassword,
-		Addr:      config.DBAddress,
-		Net:       "tcp",
-		ParseTime: true,
-		Collation: "utf8mb4_unicode_ci",
-		Loc:       jst,
+		DBName:               config.DBName,
+		User:                 config.DBUserName,
+		Passwd:               config.DBPassword,
+		Addr:                 config.DBAddress,
+		Net:                  "tcp",
+		ParseTime:            true,
+		Collation:            "utf8mb4_unicode_ci",
+		Loc:                  jst,
+		AllowNativePasswords: true,
 	}
 
 	var db *sql.DB

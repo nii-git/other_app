@@ -7,3 +7,4 @@ English-api/config/*.json
 memo.txt
 .vscode
 English-api/infra/initdb/*
+English-api/deploy.sh
