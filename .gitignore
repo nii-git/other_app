@@ -8,3 +8,4 @@ memo.txt
 .vscode
 */English-api/infra/initdb/*
 */English-api/deploy.sh
+*/English-front/node_modules/*

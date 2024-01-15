@@ -11,6 +11,7 @@ import (
 	"golang.org/x/exp/slog"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 // サーバー
@@ -34,6 +35,9 @@ func NewServer(logger slog.Logger, config config.Config, db infra.DB, handler ha
 // サーバー起動、ルーティング登録
 func (s *Server) Start() error {
 	e := echo.New()
+
+	e.Use(middleware.CORS())
+
 	e.GET("/", s.handler.HandlerFunc())
 	e.GET("/frequency", s.handler.FrequencyHandlerFunc())
 	return e.Start(s.config.ServerAddress)
