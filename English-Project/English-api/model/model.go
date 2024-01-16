@@ -14,7 +14,7 @@ type (
 	}
 	Frequency_response_body struct {
 		Word        string        `json:"word"`
-		Count       int           `json:"int"`
+		Count       int           `json:"count"`
 		ProviderId  string        `json:"provider_id"`
 		Translation []Translation `json:"translation"`
 	}
