@@ -18,8 +18,8 @@ class Media:
 
 # Media情報
 MEDIALIST = []
-MEDIALIST.append(Media(1,"BSS","http://feeds.bbci.co.uk/news/rss.xml#",'body > div > div > div > div > div > div > div > main > article > div > div > p[class*="Paragraph"]'))
-
+MEDIALIST.append(Media(1,"BBC_TOP","http://feeds.bbci.co.uk/news/rss.xml#",'body > div > div > div > div > div > div > div > main > article > div > div > p[class*="Paragraph"]'))
+MEDIALIST.append(Media(1,"BBC_WORLD","https://feeds.bbci.co.uk/news/world/rss.xml",'body > div > div > div > div > div > div > div > main > article > div > div > p[class*="Paragraph"]'))
 
     
 
