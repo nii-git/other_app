@@ -32,14 +32,14 @@ func (h *Handler) HandlerFunc() echo.HandlerFunc {
 
 func (h *Handler) FrequencyHandlerFunc() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
-		h.logger.Debug("frequency handler called")
+		h.logger.Debug("Frequency handler called")
 
 		// TODO: validation
 		limitparam := 100
 		if c.QueryParam("Limit") != "" {
 			limitparam, err = strconv.Atoi(c.QueryParam("Limit"))
 			if err != nil {
-				h.logger.Error("FrequencyHandlerFunc Invalid limitparam: " + err.Error())
+				h.logger.Error("FrequencyHandlerFunc Invalid limit param: " + err.Error())
 				return c.JSON(http.StatusBadRequest, model.Frequency_response{Error: "VALIDATION_ERROR", Body: nil})
 			}
 		}
@@ -54,10 +54,11 @@ func (h *Handler) FrequencyHandlerFunc() echo.HandlerFunc {
 		}
 
 		request := model.Frequency_request{
-			Date:  c.QueryParam("Date"),
-			Order: c.QueryParam("Order"),
-			Limit: limitparam,
-			Page:  pageparam,
+			Date:     c.QueryParam("Date"),
+			Order:    c.QueryParam("Order"),
+			Limit:    limitparam,
+			Page:     pageparam,
+			Provider: c.QueryParam("Provider"),
 		}
 
 		if err = h.validator.Validator.Struct(request); err != nil {
@@ -69,7 +70,7 @@ func (h *Handler) FrequencyHandlerFunc() echo.HandlerFunc {
 
 		if err != nil {
 			h.logger.Error("FrequencyHandlerFunc UsecaseError:" + err.Error())
-			return c.JSON(http.StatusNotFound, &model.Frequency_response{Error: "SQL_ERROR", Body: nil})
+			return c.JSON(http.StatusNotFound, &model.Frequency_response{Error: "USECASE_ERROR", Body: nil})
 		}
 		return c.JSON(http.StatusOK, res)
 	}

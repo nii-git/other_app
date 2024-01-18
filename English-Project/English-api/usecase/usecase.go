@@ -3,7 +3,6 @@ package usecase
 import (
 	"english-frequency/infra"
 	"english-frequency/model"
-	"fmt"
 
 	"golang.org/x/exp/slog"
 )
@@ -20,36 +19,30 @@ func NewUsecase(logger slog.Logger, db infra.DB) *Usecase {
 	}
 }
 
-func (u *Usecase) FrequencyUsecase(request model.Frequency_request) (*model.Frequency_response, error) {
+func (u *Usecase) FrequencyUsecase(request model.Frequency_request) (response *model.Frequency_response, err error) {
 	u.logger.Debug("Frequency usecase called")
-	query := fmt.Sprintf(`
-	SELECT frequency.provider_id, word.word, frequency.count, frequency.date
-	FROM frequency
-	LEFT JOIN word
-	ON frequency.word_id = word.id
-	WHERE date = "%s"
-	ORDER BY frequency.count DESC
-	LIMIT %d
-	OFFSET %d ;
-	`, request.Date, request.Limit, request.Page*request.Limit)
 
-	res, err := u.db.DBConnection.Query(query)
+	// Providerのvalidation
+	// handlerのvalidationだとSQL操作があるのでこちらで実施
 
-	if err != nil {
-		u.logger.Error("FrequencyUsecase QueryError: " + err.Error())
-		return nil, err
-	}
+	var result []model.FrequenciesCountDB
 
-	var result []model.Frequencies_Get_Database
-
-	for res.Next() {
-		var r model.Frequencies_Get_Database
-		err = res.Scan(&r.ProviderId, &r.WordName, &r.Count, &r.Date)
-		if err != nil {
-			u.logger.Error("FrequencyUsecase ScanError : " + err.Error())
+	if request.Provider != "" {
+		var isExistProvider bool
+		isExistProvider, err = u.db.ValidateProvider(request.Provider)
+		if err != nil || !isExistProvider {
+			u.logger.Error("FrequencyUsecase Provider Validation Error: " + err.Error())
 			return nil, err
 		}
-		result = append(result, r)
+		result, err = u.db.GetFrequencyByProvider(request.Date, request.Provider, request.Limit, request.Page*request.Limit)
+	} else {
+		// providerが空の場合は全providerの合計を用いる
+		result, err = u.db.GetFrequencyALL(request.Date, request.Limit, request.Page)
+	}
+
+	if err != nil {
+		u.logger.Error("FrequencyUsecase DBError: " + err.Error())
+		return nil, err
 	}
 
 	// dbmodel から responsemodelに変換
@@ -62,8 +55,8 @@ func (u *Usecase) FrequencyUsecase(request model.Frequency_request) (*model.Freq
 			Translation: []model.Translation{},
 		}
 	}
-	var response model.Frequency_response
+	response = new(model.Frequency_response)
 	response.Body = resbody
 
-	return &response, nil
+	return response, nil
 }

@@ -2,10 +2,11 @@ package model
 
 type (
 	Frequency_request struct {
-		Date  string `param:"date" validate:"date_validation,required"`
-		Order string `param:"order"`
-		Limit int    `param:"limit" validate:"limit_validation"`
-		Page  int    `param:"page" validate:"page_validation"`
+		Date     string `param:"date" validate:"date_validation,required"`
+		Order    string `param:"order"`
+		Limit    int    `param:"limit" validate:"limit_validation"`
+		Page     int    `param:"page" validate:"page_validation"`
+		Provider string `param:"provider"` // validationはusecaseで実施
 	}
 
 	Frequency_response struct {
