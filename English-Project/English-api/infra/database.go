@@ -143,3 +143,27 @@ func (d *DB) ValidateProvider(provider_id string) (bool, error) {
 	}
 	return true, nil
 }
+
+func (d *DB) GetMstProvider() (result []model.MstProviderDB, err error) {
+	query := `
+	SELECT *
+	FROM mst_provider;
+	`
+
+	res, err := d.DBConnection.Query(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for res.Next() {
+		var r model.MstProviderDB
+		err = res.Scan(&r.Id, &r.SiteName, &r.Url)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, r)
+	}
+
+	return result, nil
+}

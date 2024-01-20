@@ -23,4 +23,15 @@ type (
 		Wordtype string `json:"wordtype"`
 		WordJp   string `json:"word_jp"`
 	}
+
+	GetProvider_response struct {
+		Error string                      `json:"error"`
+		Body  []GetProvider_response_body `json:"body"`
+	}
+
+	GetProvider_response_body struct {
+		Id       string `json:"id"`
+		SiteName string `json:"site_name"`
+		Url      string `json:"url"`
+	}
 )

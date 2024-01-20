@@ -60,3 +60,23 @@ func (u *Usecase) FrequencyUsecase(request model.Frequency_request) (response *m
 
 	return response, nil
 }
+
+func (u *Usecase) GetProviderUsecase() (response *model.GetProvider_response, err error) {
+	u.logger.Debug("GetProvider usecase called")
+	result, err := u.db.GetMstProvider()
+
+	if err != nil {
+		u.logger.Error("GetProviderUsecase DBError: ", err)
+		return nil, err
+	}
+
+	// dbmodel から responsemodelに変換
+	resbody := make([]model.GetProvider_response_body, len(result))
+	for i, v := range result {
+		resbody[i] = model.GetProvider_response_body(v)
+	}
+
+	response = new(model.GetProvider_response)
+	response.Body = resbody
+	return response, nil
+}

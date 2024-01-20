@@ -75,3 +75,17 @@ func (h *Handler) FrequencyHandlerFunc() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, res)
 	}
 }
+
+func (h *Handler) GetProvider() echo.HandlerFunc {
+	return func(c echo.Context) (err error) {
+		h.logger.Debug("GetProvider handler called")
+
+		res, err := h.usecase.GetProviderUsecase()
+
+		if err != nil {
+			h.logger.Error("GetProviderFunc UsecaseError:" + err.Error())
+			return c.JSON(http.StatusNotFound, &model.Frequency_response{Error: "USECASE_ERROR", Body: nil})
+		}
+		return c.JSON(http.StatusOK, res)
+	}
+}

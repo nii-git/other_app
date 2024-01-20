@@ -40,6 +40,7 @@ func (s *Server) Start() error {
 
 	e.GET("/", s.handler.HandlerFunc())
 	e.GET("/frequency", s.handler.FrequencyHandlerFunc())
+	e.GET("/provider", s.handler.GetProvider())
 	return e.Start(s.config.ServerAddress)
 }
 
