@@ -40,10 +40,11 @@ const TopPage = () => {
     const fetchData = async () => {
       
       try {
-        const response_today = await axios.get("localhost:1323/frequency?Date="+ date_today+"&Page=0&Limit=10");
+        const response_today = await axios.get("http://localhost:1323/frequency?Date="+ date_today+"&Page=0&Limit=10");
         // const response_today = await axios.get("https://murasa-nii.net/frequency?Date="+ date_today+"&Page=0&Limit=10");
         setData_today(response_today.data);
       } catch (error) {
+        console.error("Error fetching data:", error);
         const errMsg = error.response.data.error || error.messaage
         setData_today(errMsg)
         console.error("Error fetching data:", errMsg);
