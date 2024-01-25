@@ -1,34 +1,34 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link,useLocation } from "react-router-dom";
+import { Button,SIZE } from "baseui/button";
+import { DatePicker } from "baseui/datepicker";
+import { Table } from "baseui/table";
 
 
 
 
 function DescribeWord(data,date){
-  console.dir(data)
+  // console.dir(data)
+
+  var dataResultArray = data ? (data.body.map(function(item) {
+    return [item.word, item.count];
+  })) : null;
 
   return (
     <>{data ? (
         <div>
-          <table>
-            <thead>
-              <tr>
-                <th colSpan="2">{date} 集計結果</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.body.map((item, index) => (
-                <tr>
-                  <td key={"word"+index}>{item.word}</td>
-                  <td key={"count"+index}>{item.count}</td>
-                </tr>
-            ))}
-            </tbody>
-          </table>
+          <Table 
+            columns={["Word","Count"]} data={dataResultArray} 
+          />
         </div>
       ) : (
-        <p>Today's Loading data...</p>
+        <div>
+          <Table 
+            columns={["Word","Count"]} data={[]} 
+            isLoading
+          />
+        </div>
       )}
     </>
   )
@@ -41,12 +41,16 @@ export const Providers =() => {
   const date_today = new Date().toISOString().slice(0,10)
   const [data, setData] = useState(null);
   const [date, setDate] = useState(date_today)
+
+  console.log("hello")
+  console.log(date)
+
   
 
   useEffect(() => {
     const fetchData = async () => {
-      const response_today = await axios.get("http://localhost:1323/frequency?Date="+date+"&Page=0&Limit=10");
-      // const response_today = await axios.get("https://murasa-nii.net/frequency?Date="+ date_today+"&Page=0&Limit=10");
+      // const response_today = await axios.get("http://localhost:1323/frequency?Date="+date+"&Page=0&Limit=10");
+      const response_today = await axios.get("https://murasa-nii.net/frequency?Date="+ date +"&Page=0&Limit=10");
       setData(response_today.data);
     }
     fetchData();
@@ -59,18 +63,33 @@ export const Providers =() => {
 
   return (
     <>
-      <h1>Sample Home</h1>
-      <>
-        {providerid}
-      </>
+      <h1>{providerid}</h1>
       <div>
-        {data ? DescribeWord(data,date) : "データ取得中です..."}
+        {DescribeWord(data,date)}
       </div>
 
       {/* todo */}
       <div>
+      <DatePicker
+      value={
+        new Date(date)
+      }
+      onChange={({ date }) =>
+      setDate(date.toISOString().slice(0,10) )
+      }
+      />
         <input type="text" id="date"></input>
+        <Button
+      onClick={handleDateButtonClick}
+      size={SIZE.compact}
+      >
+        日付設定
+      </Button>
         <input type="button" value="日付" onClick={handleDateButtonClick}></input>
+      </div>
+
+      <div>
+        <a href="../">戻る</a>
       </div>
     </>
   );
