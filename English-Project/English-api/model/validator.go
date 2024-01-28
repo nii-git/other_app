@@ -26,7 +26,7 @@ func Date_validation(fl validator.FieldLevel) bool {
 func Limit_validation(fl validator.FieldLevel) bool {
 	limit := fl.Field().Int()
 	// todo: MAX_LIMITは環境変数に入れたい
-	return (limit >= 0) && (limit < 1000)
+	return (limit >= 0) && (limit <= 1000)
 }
 
 func Page_validation(fl validator.FieldLevel) bool {

@@ -4,8 +4,51 @@ import { Link,useLocation } from "react-router-dom";
 import { Button,SIZE } from "baseui/button";
 import { DatePicker } from "baseui/datepicker";
 import { Table } from "baseui/table";
+import { Select } from "baseui/select";
+import { Pagination } from "baseui/pagination";
 
 
+function SelectLimit(limit,setFunc)  {
+
+  return (
+    <Select
+      clearable={false}
+      options={[
+        {
+          label: "10",
+          id: "#F0F8FF"
+        },
+        {
+          label: "100",
+          id: "#FAEBD7"
+        },
+        {
+          label: "1000",
+          id: "#00FFFF"
+        }
+      ]}
+      value={limit}
+      placeholder="Select color"
+      onChange={params => setFunc(params.value)}
+    />
+  );
+}
+
+
+function GetPagination (page,setFunc) {
+  return (
+    <Pagination
+      numPages={20}
+      size={SIZE.compact}
+      currentPage={page}
+      onPageChange={({ nextPage }) => {
+        setFunc(
+          Math.min(Math.max(nextPage, 1), 20)
+        );
+      }}
+    />
+  );
+}
 
 
 function DescribeWord(data,date){
@@ -34,13 +77,20 @@ function DescribeWord(data,date){
   )
 }
 
-export const Providers =() => {
+export const Providers = ({isDarkMode,setDarkFunc}) => {
   const search = useLocation().search;
   const query = new URLSearchParams(search);
-  const providerid = query.get("id")
-  const date_today = new Date().toISOString().slice(0,10)
+  const providerid = query.get("id");
+  const date_today = new Date().toISOString().slice(0,10);
   const [data, setData] = useState(null);
-  const [date, setDate] = useState(date_today)
+  const [date, setDate] = useState(date_today);
+  const [limit, setLimit] = React.useState([
+    {
+      label: "10",
+      id: "#F0F8FF"
+    }
+  ]);
+  const [currentPage, setCurrentPage] = React.useState(1);
 
   console.log("hello")
   console.log(date)
@@ -48,13 +98,17 @@ export const Providers =() => {
   
 
   useEffect(() => {
+    console.log(limit)
     const fetchData = async () => {
+      const lim = limit ? limit[0].label: "10";
+      const page = currentPage ? currentPage - 1 : "0"
       // const response_today = await axios.get("http://localhost:1323/frequency?Date="+date+"&Page=0&Limit=10");
-      const response_today = await axios.get("https://murasa-nii.net/frequency?Date="+ date +"&Page=0&Limit=10");
+      setData(null)
+      const response_today = await axios.get("https://murasa-nii.net/frequency?Date="+ date +"&Page="+ page +"&Limit=" + lim + "&Provider=" + providerid);
       setData(response_today.data);
     }
     fetchData();
-  }, [date]);
+  }, [date,limit,currentPage]);
 
   const handleDateButtonClick = () => {
     const newDate = document.getElementById("date").value;
@@ -64,11 +118,7 @@ export const Providers =() => {
   return (
     <>
       <h1>{providerid}</h1>
-      <div>
-        {DescribeWord(data,date)}
-      </div>
 
-      {/* todo */}
       <div>
       <DatePicker
       value={
@@ -78,18 +128,31 @@ export const Providers =() => {
       setDate(date.toISOString().slice(0,10) )
       }
       />
-        <input type="text" id="date"></input>
-        <Button
-      onClick={handleDateButtonClick}
-      size={SIZE.compact}
-      >
-        日付設定
-      </Button>
-        <input type="button" value="日付" onClick={handleDateButtonClick}></input>
       </div>
 
       <div>
-        <a href="../">戻る</a>
+        {SelectLimit(limit,setLimit)}
+      </div>
+
+      <div>
+        {GetPagination(currentPage,setCurrentPage)}
+      </div>
+
+      <div>
+        {DescribeWord(data,date)}
+      </div>
+
+      <div>
+        {GetPagination(currentPage,setCurrentPage)}
+      </div>
+
+      <div>
+      <Button size={SIZE.compact} onClick={()=>{history.back()}}>
+        戻る
+      </Button>
+      <Button size={SIZE.compact} onClick={()=>{setDarkFunc(!isDarkMode)}}>
+        change
+      </Button>
       </div>
     </>
   );
