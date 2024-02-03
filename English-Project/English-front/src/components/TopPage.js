@@ -12,6 +12,7 @@ import {
   TableBuilder,
   TableBuilderColumn,
 } from 'baseui/table-semantic';
+import { Header } from "./Header.js"
 
 function DescribeToday(data,date){
   var dataResultArray = data ? (data.body.map(function(item) {
@@ -44,11 +45,12 @@ function DescribeProvider(data){
     var dataResultArray = data ? data.body : null;
   
     return (
-      <>{data ? (
+      <>
+      {data ? (
           <div>
             <TableBuilder data={dataResultArray}>
               <TableBuilderColumn header="ID">
-                {(row) => <a href={"./providers?id="+row.id}>{row.id}</a>}
+                {(row) => <a href={"./provider?id="+row.id}>{row.id}</a>}
               </TableBuilderColumn>
               <TableBuilderColumn header="SiteName" numeric>
                 {(row) => row.site_name}
@@ -66,33 +68,6 @@ function DescribeProvider(data){
       </>
     )
   
-
-  // return (
-  //   <>{data && data.body  ? (
-  //       <div>
-  //         <table>
-  //           <thead>
-  //             <tr>
-  //               <th colspan="2">providers</th>
-  //             </tr>
-  //           </thead>
-  //           <tbody>
-  //             {data.body.map((item, index) => (
-  //               <tr>
-  //                 <a href={"./providers?id=" +item.id }>{item.site_name}</a>
-  //                 <td key={"word"+index}>{item.id}</td>
-  //                 <td key={"count"+index}>{item.site_name}</td>
-  //                 <td key={"url"+index}>{item.url}</td>
-  //               </tr>
-  //           ))}
-  //           </tbody>
-  //         </table>
-  //       </div>
-  //     ) : (
-  //       <p>Provider Loading data...</p>
-  //     )}
-  //   </>
-  // )
 }
 
 const TopPage = () => {
@@ -122,14 +97,23 @@ const TopPage = () => {
   }, []);
 
   return (
-    <div>
+    <>
+      <Header></Header>
       <div>
-        {data_today ? DescribeToday(data_today,date_today) : "データ取得中です..."}
+        <header className='about-header'>
+          <h1>Today's words</h1>
+        </header>
+        <div>
+          {data_today ? DescribeToday(data_today,date_today) : "データ取得中です..."}
+        </div>
+        <header className='about-header'>
+          <h1>Target Websites</h1>
+        </header>
+        <div>
+          {provider ? DescribeProvider(provider): "Providerデータ取得中です..."}
+        </div>
       </div>
-      <div>
-        {provider ? DescribeProvider(provider): "Providerデータ取得中です..."}
-      </div>
-    </div>
+    </>
   );
 };
 

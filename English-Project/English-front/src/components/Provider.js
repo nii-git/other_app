@@ -6,6 +6,7 @@ import { DatePicker } from "baseui/datepicker";
 import { Table } from "baseui/table";
 import { Select } from "baseui/select";
 import { Pagination } from "baseui/pagination";
+import { Header } from "./Header.js";
 
 
 function SelectLimit(limit,setFunc)  {
@@ -77,7 +78,7 @@ function DescribeWord(data,date){
   )
 }
 
-export const Providers = ({isDarkMode,setDarkFunc}) => {
+export const Provider = ({isDarkMode,setDarkFunc}) => {
   const search = useLocation().search;
   const query = new URLSearchParams(search);
   const providerid = query.get("id");
@@ -117,7 +118,11 @@ export const Providers = ({isDarkMode,setDarkFunc}) => {
 
   return (
     <>
-      <h1>{providerid}</h1>
+      <Header></Header>
+
+      <header className='about-header'>
+          <h1>{providerid}</h1>
+      </header>
 
       <div>
       <DatePicker

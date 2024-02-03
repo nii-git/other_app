@@ -1,0 +1,36 @@
+.about-header {
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+  padding: 1rem;
+  margin-bottom: 0;
+}
+
+.about-header h1 {
+  font-size: 2rem;
+  margin: 0;
+  font-weight: 200;
+}
+
+.about-section {
+  margin: 2.5rem 2rem; /* 上下の余白を調整 */
+}
+
+.about-section h2 {
+  color: #000;
+  font-size: 1.5rem; /* h2文字のサイズを大きく */
+}
+
+.about-section p {
+  font-size: 1.2rem; /* p文字のサイズを大きく */
+}
+
+.about-footer {
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+  padding: 1rem;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
