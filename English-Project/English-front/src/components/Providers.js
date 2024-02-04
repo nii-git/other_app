@@ -110,9 +110,8 @@ export const Providers = ({isDarkMode,setDarkFunc}) => {
     const fetchData = async () => {
       const lim = limit ? limit[0].label: "10";
       const page = currentPage ? currentPage - 1 : "0"
-      const response = await axios.get("http://localhost:1323/provider?Date="+date+"&Page="+ page +"&Limit=" + lim + "&Provider=" + providerid);
+      const response = await axios.get("https://murasa-nii.net/provider?Date="+date+"&Page="+ page +"&Limit=" + lim + "&Provider=" + providerid);
       setProviders(response.data)
-      // const response_today = await axios.get("https://murasa-nii.net/frequency?Date="+ date +"&Page="+ page +"&Limit=" + lim + "&Provider=" + providerid);
     }
     fetchData();
   }, [date,limit,currentPage]);
