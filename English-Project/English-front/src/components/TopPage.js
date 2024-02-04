@@ -104,7 +104,7 @@ const TopPage = () => {
           <h1>Today's words</h1>
         </header>
         <div>
-          {data_today ? DescribeToday(data_today,date_today) : "データ取得中です..."}
+          {data_today ? data_today.body.length > 0 ? DescribeToday(data_today,date_today) : "取得エラー" : "データ取得中です..."}
         </div>
         <header className='about-header'>
           <h1>Target Websites</h1>

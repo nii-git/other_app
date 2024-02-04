@@ -79,6 +79,7 @@ def output(df_groupby,provider,day):
                         db_error_killed_process(conn,"ERROR: Failed to get wordid")
                     word_id = cur.fetchall()[0][0]
                 elif result_count > 1:
+                    print("ERROR trace: word = %s, count = %s, result_count = %d" % (word,count,result_count))
                     db_error_killed_process(conn,"ERROR: Inconsistency in word table")
                 else:
                     word_id = cur.fetchall()[0][0]
