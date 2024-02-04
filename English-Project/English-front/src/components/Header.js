@@ -9,7 +9,7 @@ import {
   } from "baseui/header-navigation";
   import { StyledLink } from "baseui/link";
   import { Button } from "baseui/button";
-  import logoImg from "./../img/sample-logo.png"
+  import logoImg from "./../img/logo.png"
   import { BrowserView, MobileView, isBrowser, isMobile } from 'react-device-detect';
 
 

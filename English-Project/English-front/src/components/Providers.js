@@ -129,11 +129,15 @@ export const Providers = ({isDarkMode,setDarkFunc}) => {
       <header className='about-header'>
           <h1>Websites</h1>
       </header>
-
-      <div>
-        {SelectLimit(limit,setLimit)}
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+        <div style={{ width: "49%"}}>
+          <span>表示数: </span>
+          <div style={{  border: "2px solid black",
+            borderRadius: "8px"}}>
+          {SelectLimit(limit, setLimit)}
+          </div>
+        </div>
       </div>
-
       <div>
         {DescribeProvider(providers)}
       </div>
@@ -146,9 +150,7 @@ export const Providers = ({isDarkMode,setDarkFunc}) => {
       <Button size={SIZE.compact} onClick={()=>{history.back()}}>
         戻る
       </Button>
-      <Button size={SIZE.compact} onClick={()=>{setDarkFunc(!isDarkMode)}}>
-        change
-      </Button>
+
       </div>
     </>
   );

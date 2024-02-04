@@ -52,7 +52,7 @@ function DescribeProvider(data){
               <TableBuilderColumn header="ID">
                 {(row) => <a href={"./provider?id="+row.id}>{row.id}</a>}
               </TableBuilderColumn>
-              <TableBuilderColumn header="SiteName" numeric>
+              <TableBuilderColumn header="SiteName">
                 {(row) => row.site_name}
               </TableBuilderColumn>
             </TableBuilder>
