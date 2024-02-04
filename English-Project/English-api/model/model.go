@@ -24,6 +24,11 @@ type (
 		WordJp   string `json:"word_jp"`
 	}
 
+	GetProvider_request struct {
+		Limit int `param:"limit" validate:"limit_validation"`
+		Page  int `param:"page" validate:"page_validation"`
+	}
+
 	GetProvider_response struct {
 		Error string                      `json:"error"`
 		Body  []GetProvider_response_body `json:"body"`

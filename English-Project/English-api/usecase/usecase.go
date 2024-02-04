@@ -61,9 +61,9 @@ func (u *Usecase) FrequencyUsecase(request model.Frequency_request) (response *m
 	return response, nil
 }
 
-func (u *Usecase) GetProviderUsecase() (response *model.GetProvider_response, err error) {
+func (u *Usecase) GetProviderUsecase(request model.GetProvider_request) (response *model.GetProvider_response, err error) {
 	u.logger.Debug("GetProvider usecase called")
-	result, err := u.db.GetMstProvider()
+	result, err := u.db.GetMstProvider(request.Limit, request.Page)
 
 	if err != nil {
 		u.logger.Error("GetProviderUsecase DBError: ", err)

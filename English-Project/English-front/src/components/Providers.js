@@ -7,6 +7,10 @@ import { Table } from "baseui/table";
 import { Select } from "baseui/select";
 import { Pagination } from "baseui/pagination";
 import { Header } from "./Header.js";
+import {
+  TableBuilder,
+  TableBuilderColumn,
+} from 'baseui/table-semantic';
 
 
 function SelectLimit(limit,setFunc)  {
@@ -52,37 +56,41 @@ function GetPagination (page,setFunc) {
 }
 
 
-function DescribeWord(data,date){
-  // console.dir(data)
+function DescribeProvider(providers){
 
-  var dataResultArray = data ? (data.body.map(function(item) {
-    return [item.word, item.count];
-  })) : null;
+  var dataResultArray = providers ? providers.body : null;
 
+  console.log(dataResultArray)
   return (
-    <>{data ? (
-        <div>
-          <Table 
-            columns={["Word","Count"]} data={dataResultArray} 
-          />
-        </div>
+    <>{dataResultArray ? (
+      <div>
+      <TableBuilder data={dataResultArray}>
+        <TableBuilderColumn header="ID">
+          {(row) => <a href={"./provider?id="+row.id}>{row.id}</a>}
+        </TableBuilderColumn>
+        <TableBuilderColumn header="SiteName" numeric>
+          {(row) => row.site_name}
+        </TableBuilderColumn>
+      </TableBuilder>
+    </div>
       ) : (
         <div>
-          <Table 
-            columns={["Word","Count"]} data={[]} 
-            isLoading
-          />
-        </div>
+        <Table 
+          columns={["ID","SiteName"]} data={[]} 
+          isLoading
+        />
+      </div>
       )}
     </>
   )
 }
 
-export const Provider = ({isDarkMode,setDarkFunc}) => {
+export const Providers = ({isDarkMode,setDarkFunc}) => {
   const search = useLocation().search;
   const query = new URLSearchParams(search);
   const providerid = query.get("id");
   const date_today = new Date().toISOString().slice(0,10);
+  const [providers, setProviders] = useState(null);
   const [data, setData] = useState(null);
   const [date, setDate] = useState(date_today);
   const [limit, setLimit] = React.useState([
@@ -93,6 +101,7 @@ export const Provider = ({isDarkMode,setDarkFunc}) => {
   ]);
   const [currentPage, setCurrentPage] = React.useState(1);
 
+  console.log(date)
 
   
 
@@ -101,10 +110,9 @@ export const Provider = ({isDarkMode,setDarkFunc}) => {
     const fetchData = async () => {
       const lim = limit ? limit[0].label: "10";
       const page = currentPage ? currentPage - 1 : "0"
-      // const response_today = await axios.get("http://localhost:1323/frequency?Date="+date+"&Page=0&Limit=10");
-      setData(null)
-      const response_today = await axios.get("https://murasa-nii.net/frequency?Date="+ date +"&Page="+ page +"&Limit=" + lim + "&Provider=" + providerid);
-      setData(response_today.data);
+      const response = await axios.get("http://localhost:1323/provider?Date="+date+"&Page="+ page +"&Limit=" + lim + "&Provider=" + providerid);
+      setProviders(response.data)
+      // const response_today = await axios.get("https://murasa-nii.net/frequency?Date="+ date +"&Page="+ page +"&Limit=" + lim + "&Provider=" + providerid);
     }
     fetchData();
   }, [date,limit,currentPage]);
@@ -119,30 +127,15 @@ export const Provider = ({isDarkMode,setDarkFunc}) => {
       <Header></Header>
 
       <header className='about-header'>
-          <h1>{providerid}</h1>
+          <h1>Websites</h1>
       </header>
-
-      <div>
-      <DatePicker
-      value={
-        new Date(date)
-      }
-      onChange={({ date }) =>
-      setDate(date.toISOString().slice(0,10) )
-      }
-      />
-      </div>
 
       <div>
         {SelectLimit(limit,setLimit)}
       </div>
 
       <div>
-        {GetPagination(currentPage,setCurrentPage)}
-      </div>
-
-      <div>
-        {DescribeWord(data,date)}
+        {DescribeProvider(providers)}
       </div>
 
       <div>

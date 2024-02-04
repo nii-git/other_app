@@ -80,7 +80,7 @@ const TopPage = () => {
       
       try {
         // const response_provider = await axios.get("http://localhost:1323/provider")
-        const response_provider = await axios.get("https://murasa-nii.net/provider")
+        const response_provider = await axios.get("https://murasa-nii.net/provider?Page=0&Limit10")
         setProvider(response_provider.data);
         // const response_today = await axios.get("http://localhost:1323/frequency?Date="+"2024-01-15"+"&Page=0&Limit=10");
         const response_today = await axios.get("https://murasa-nii.net/frequency?Date="+ date_today+"&Page=0&Limit=10");
@@ -110,6 +110,7 @@ const TopPage = () => {
           <h1>Target Websites</h1>
         </header>
         <div>
+          {/* さらに見るボタンはProviderページに遷移 */}
           {provider ? DescribeProvider(provider): "Providerデータ取得中です..."}
         </div>
       </div>

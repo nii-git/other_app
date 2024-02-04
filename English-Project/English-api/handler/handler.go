@@ -80,7 +80,35 @@ func (h *Handler) GetProvider() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 		h.logger.Debug("GetProvider handler called")
 
-		res, err := h.usecase.GetProviderUsecase()
+		limitparam := 10
+		if c.QueryParam("Limit") != "" {
+			limitparam, err = strconv.Atoi(c.QueryParam("Limit"))
+			if err != nil {
+				h.logger.Error("GetProvider Invalid limit param: " + err.Error())
+				return c.JSON(http.StatusBadRequest, model.Frequency_response{Error: "VALIDATION_ERROR", Body: nil})
+			}
+		}
+
+		pageparam := 0
+		if c.QueryParam("Page") != "" {
+			pageparam, err = strconv.Atoi(c.QueryParam("Page"))
+			if err != nil {
+				h.logger.Error("GetProvider Invalid pageparam: " + err.Error())
+				return c.JSON(http.StatusBadRequest, model.Frequency_response{Error: "VALIDATION_ERROR", Body: nil})
+			}
+		}
+
+		request := model.GetProvider_request{
+			Limit: limitparam,
+			Page:  pageparam,
+		}
+
+		if err = h.validator.Validator.Struct(request); err != nil {
+			h.logger.Error("GetProvider ValidationError: " + err.Error())
+			return c.JSON(http.StatusBadRequest, &model.Frequency_response{Error: "VALIDATION_ERROR", Body: nil})
+		}
+
+		res, err := h.usecase.GetProviderUsecase(request)
 
 		if err != nil {
 			h.logger.Error("GetProviderFunc UsecaseError:" + err.Error())

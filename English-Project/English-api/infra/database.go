@@ -144,11 +144,13 @@ func (d *DB) ValidateProvider(provider_id string) (bool, error) {
 	return true, nil
 }
 
-func (d *DB) GetMstProvider() (result []model.MstProviderDB, err error) {
-	query := `
+func (d *DB) GetMstProvider(limit, page int) (result []model.MstProviderDB, err error) {
+	query := fmt.Sprintf(`
 	SELECT *
-	FROM mst_provider;
-	`
+	FROM mst_provider
+	LIMIT %d
+	OFFSET %d;
+	`, limit, page*limit)
 
 	res, err := d.DBConnection.Query(query)
 

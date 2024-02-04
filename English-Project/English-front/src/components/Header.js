@@ -36,7 +36,10 @@ export const Header = () => {
         </StyledNavigationList>
         <StyledNavigationList $align={ALIGN.right}>
         <StyledNavigationItem>
-            <Button>Search</Button>
+          {/* 実装次第Searchに変えます */}
+          <StyledLink href="/">
+            <Button>TopPage</Button>
+          </StyledLink>
         </StyledNavigationItem>
         </StyledNavigationList>
     </HeaderNavigation>
