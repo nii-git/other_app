@@ -8,9 +8,9 @@ import pandas as pd
 
 
 # todo: 環境変数に移す
-ENDPOINT="free-db.cfoyprdoczrs.ap-northeast-1.rds.amazonaws.com"
+# ENDPOINT="free-db.cfoyprdoczrs.ap-northeast-1.rds.amazonaws.com"
 PORT="3306"
-USER="admin"
+USER="normal_user"
 REGION="ap-northeast"
 DBNAME="english_frequency"
 
@@ -48,7 +48,7 @@ def db_error_killed_process(conn,err_msg,rollback=True):
     sys.exit(-1)
 
 def output(df_groupby,provider,day):
-    with pymysql.connect(host=ENDPOINT, user=USER, passwd=os.environ["db_pass"], db=DBNAME) as conn:
+    with pymysql.connect(host=os.environ["endpoint"], user=USER, passwd=os.environ["db_pass"], db=DBNAME) as conn:
         with conn.cursor() as cur:
             # fixme:未分類のカテゴリIDを取得 
             result_count = cur.execute("SELECT word_type_id FROM mst_wordtype WHERE word_type_name = '未分類'")
