@@ -9,3 +9,7 @@ memo.txt
 */English-api/infra/initdb/*
 */English-api/deploy.sh
 */English-front/node_modules/*
+Discord-bot/.token
+Discord-bot/config.json
+Discord-bot/db_data/*
+Discord-bot/docker-compose.yml
